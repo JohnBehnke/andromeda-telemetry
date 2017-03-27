@@ -1,63 +1,189 @@
-{
-    "name": "Example Spacecraft",
+ {
+    "name": "Andromeda Spacecraft",
     "identifier": "sc",
     "subsystems": [
         {
-            "name": "Propulsion",
-            "identifier": "prop",
+            "name": "Debug",
+            "identifier": "debug",
             "measurements": [
                 {
-                    "name": "Fuel",
-                    "identifier": "prop.fuel",
-                    "units": "kilograms",
-                    "type": "float"
+                    "name": "Message",
+                    "identifier": "debug.message",
+                    "units": "",
+                    "type": "string"
                 },
                 {
-                    "name": "Thrusters",
-                    "identifier": "prop.thrusters",
-                    "units": "None",
+                    "name": "Error",
+                    "identifier": "debug.error",
+                    "units": "",
+                    "type": "string"
+                },
+                {
+                    "name": "Phase",
+                    "identifier": "debug.phase",
+                    "units": "",
                     "type": "string"
                 }
             ]
         },
         {
-            "name": "Communications",
-            "identifier": "comms",
+            "name": "Science",
+            "identifier": "sci",
             "measurements": [
                 {
-                    "name": "Received",
-                    "identifier": "comms.recd",
-                    "units": "bytes",
+                    "name": "Altitude to Ground",
+                    "identifier": "sci.atg",
+                    "units": "meters",
                     "type": "integer"
                 },
                 {
-                    "name": "Sent",
-                    "identifier": "comms.sent",
-                    "units": "bytes",
-                    "type": "integer"
-                }
-            ]
-        },
-        {
-            "name": "Power",
-            "identifier": "pwr",
-            "measurements": [
-                {
-                    "name": "Generator Temperature",
-                    "identifier": "pwr.temp",
-                    "units": "\u0080C",
+                    "name": "Acceleration X",
+                    "identifier": "sci.acclx",
+                    "units": "",
                     "type": "float"
                 },
                 {
-                    "name": "Generator Current",
-                    "identifier": "pwr.c",
-                    "units": "A",
+                    "name": "Acceleration Y",
+                    "identifier": "sci.accly",
+                    "units": "",
                     "type": "float"
                 },
                 {
-                    "name": "Generator Voltage",
-                    "identifier": "pwr.v",
-                    "units": "V",
+                    "name": "Acceleration Z",
+                    "identifier": "sci.acclz",
+                    "units": "",
+                    "type": "float"
+                },
+                {
+                    "name": "Mag X",
+                    "identifier": "sci.magx",
+                    "units": "",
+                    "type": "float"
+                },
+                {
+                    "name": "Mag Y",
+                    "identifier": "sci.magy",
+                    "units": "",
+                    "type": "float"
+                },
+                {
+                    "name": "Mag Z",
+                    "identifier": "sci.magz",
+                    "units": "",
+                    "type": "float"
+                },
+                {
+                    "name": "Gyro X",
+                    "identifier": "sci.gyrox",
+                    "units": "",
+                    "type": "float"
+                },
+                {
+                    "name": "Gyro Y",
+                    "identifier": "sci.gyroy",
+                    "units": "",
+                    "type": "float"
+                },
+                {
+                    "name": "Gyro Z",
+                    "identifier": "sci.gyroz",
+                    "units": "",
+                    "type": "float"
+                },
+                {
+                    "name" : "GPS Hour",
+                    "identifier" : "sci.gpsHour",
+                    "units" : "",
+                    "type" : "float" 
+
+                },
+                {
+                    "name" : "GPS Minutes",
+                    "identifier" : "sci.gpsMin",
+                    "units" : "",
+                    "type" : "float" 
+                },
+                {
+                    "name" : "GPS Seconds",
+                    "identifier" : "sci.gpsSec",
+                    "units" : "",
+                    "type" : "float" 
+                },
+
+
+                {
+                    "name" : "GPS Day",
+                    "identifier" : "sci.gpsDay",
+                    "units" : "",
+                    "type" : "float" 
+                },
+
+                {
+                    "name" : "GPS Month",
+                    "identifier" : "sci.gpsMonth",
+                    "units" : "",
+                    "type" : "float" 
+                },
+                {
+                    "name" : "GPS Year",
+                    "identifier" : "sci.gpsYear",
+                    "units" : "",
+                    "type" : "float" 
+                },
+
+                {
+                    "name" : "GPS Fix",
+                    "identifier" : "sci.gpsfix",
+                    "units" : "",
+                    "type" : "float" 
+                },
+                {
+                    "name" : "GPS Fix Quality",
+                    "identifier" : "sci.gpsFixQuality",
+                    "units" : "",
+                    "type" : "float" 
+                },
+                {
+                    "name" : "GPS Latitude",
+                    "identifier" : "sci.gpsLatitude",
+                    "units" : "",
+                    "type" : "float" 
+                },
+
+                {
+                    "name" : "GPS Longitude",
+                    "identifier" : "sci.gpsLongitude",
+                    "units" : "",
+                    "type" : "float" 
+                },
+                {
+                    "name" : "GPS Speed",
+                    "identifier" : "sci.gpsSpeed",
+                    "units" : "",
+                    "type" : "float" 
+                },
+                {
+                    "name" : "GPS Angle",
+                    "identifier" : "sci.gpsAngle",
+                    "units" : "",
+                    "type" : "float" 
+                },
+                {
+                    "name" : "GPS Satelites",
+                    "identifier" : "sci.gpsSatelites",
+                    "units" : "",
+                    "type" : "float" 
+                },
+                {
+                    "name": "Motor A",
+                    "identifier": "sci.motora",
+                    "units": "",
+                    "type": "float"
+                },
+                {
+                    "name": "Motor B",
+                    "identifier": "sci.motorb",
+                    "units": "",
                     "type": "float"
                 }
             ]

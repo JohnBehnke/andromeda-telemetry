@@ -1,127 +1,214 @@
 /*global require,process,console*/
-
+var csv = require("fast-csv");
 var CONFIG = {
     port: 8081,
     dictionary: "dictionary.json",
     interval: 1000
 };
+var SerialPort = require('serialport');
+var port = new SerialPort('/dev/cu.usbserial-DA00SS8O', {
+    parser: SerialPort.parsers.readline('\n')
 
-(function () {
-    "use strict";
+});
+var timeStamp = 0;
 
-    var WebSocketServer = require('ws').Server,
-        fs = require('fs'),
-        wss = new WebSocketServer({ port: CONFIG.port }),
-        dictionary = JSON.parse(fs.readFileSync(CONFIG.dictionary, "utf8")),
-        spacecraft = {
-            "prop.fuel": 77,
-            "prop.thrusters": "OFF",
-            "comms.recd": 0,
-            "comms.sent": 0,
-            "pwr.temp": 245,
-            "pwr.c": 8.15,
-            "pwr.v": 30
-        },
-        histories = {},
-        listeners = [];
+port.on('data', function(data) {
+    console.log("dadas")
+    updateSpacecraft(data);
+    generateTelemetry();
+});
 
-    function updateSpacecraft() {
-        spacecraft["prop.fuel"] = Math.max(
-            0,
-            spacecraft["prop.fuel"] -
-                (spacecraft["prop.thrusters"] === "ON" ? 0.5 : 0)
-        );
-        spacecraft["pwr.temp"] = spacecraft["pwr.temp"] * 0.985
-            + Math.random() * 0.25 + Math.sin(Date.now());
-        spacecraft["pwr.c"] = spacecraft["pwr.c"] * 0.985;
-        spacecraft["pwr.v"] = 30 + Math.pow(Math.random(), 3);
+
+var WebSocketServer = require('ws').Server,
+    fs = require('fs'),
+    wss = new WebSocketServer({
+        port: 8081
+    }),
+
+    dictionary = JSON.parse(fs.readFileSync(CONFIG.dictionary, "utf8")),
+    spacecraft = {
+        "debug.message": "",
+        "debug.error": "",
+        "debug.phase": "",
+        "sci.atg": 0,
+        "sci.acclx": 0.0,
+        "sci.accly": 0.0,
+        "sci.acclz": 0.0,
+        "sci.magx": 0.0,
+        "sci.magy": 0.0,
+        "sci.magz": 0.0,
+        "sci.gyrox": 0.0,
+        "sci.gyroy": 0.0,
+        "sci.gyroz": 0.0,
+        "sci.gpsHour": 0.0,
+        "sci.gpsMin": 0.0,
+        "sci.gpsSec": 0.0,
+        "sci.gpsDay": 0.0,
+        "sci.gpsMonth": 0.0,
+        "sci.gpsYear": 0.0,
+        "sci.gpsfix": 0.0,
+        "sci.gpsFixQuality": 0.0,
+        "sci.gpsLatitude": 0.0,
+        "sci.gpsLongitude": 0.0,
+        "sci.gpsSpeed": 0.0,
+        "sci.gpsAngle": 0.0,
+        "sci.gpsSatelites": 0.0,
+        "sci.motora": 0.0,
+        "sci.motorb": 0.0
+    },
+    histories = {},
+    listeners = [];
+
+function updateSpacecraft(data) {
+
+    data = data.split(',')
+
+    timeStamp = parseInt(data[1])
+    if (data[0] == 'MESSAGE') {
+
+        spacecraft["debug.message"] = data[2]
+            // value = data[3]
     }
 
-    function generateTelemetry() {
-        var timestamp = Date.now(), sent = 0;
-        Object.keys(spacecraft).forEach(function (id) {
-            var state = { timestamp: timestamp, value: spacecraft[id] };
-            histories[id] = histories[id] || []; // Initialize
-            histories[id].push(state);
-            spacecraft["comms.sent"] += JSON.stringify(state).length;
-        });
-        listeners.forEach(function (listener) {
-            listener();
-        });
+    if (data[0] == 'ERROR') {
+        // timeStamp = parseInt(data[1])
+        spacecraft["debug.error"] = data[2]
     }
 
-    function update() {
-        updateSpacecraft();
-        generateTelemetry();
+    if (data[0] == 'ALT') {
+        // timeStamp = parseInt(data[1])
+        spacecraft["sci.atg"] = parseInt(data[2])
     }
 
-    function handleConnection(ws) {
-        var subscriptions = {}, // Active subscriptions for this connection
-            handlers = {        // Handlers for specific requests
-                dictionary: function () {
-                    ws.send(JSON.stringify({
-                        type: "dictionary",
-                        value: dictionary
-                    }));
-                },
-                subscribe: function (id) {
-                    subscriptions[id] = true;
-                },
-                unsubscribe: function (id) {
-                    delete subscriptions[id];
-                },
-                history: function (id) {
-                    ws.send(JSON.stringify({
-                        type: "history",
-                        id: id,
-                        value: histories[id]
-                    }));
-                }
-            };
+    if (data[0] == 'ACCEL') {
+        // timeStamp = parseInt(data[1])
+        spacecraft["sci.acclx"] = parseFloat(data[2])
+        spacecraft["sci.accly"] = parseFloat(data[3])
+        spacecraft["sci.acclz"] = parseFloat(data[4])
+    }
 
-        function notifySubscribers() {
-            Object.keys(subscriptions).forEach(function (id) {
-                var history = histories[id];
-                if (history) {
-                    ws.send(JSON.stringify({
-                        type: "data",
-                        id: id,
-                        value: history[history.length - 1]
-                    }));
-                }
-            });
-        }
+    if (data[0] == 'MAG') {
+        // timeStamp = parseInt(data[1])
+        spacecraft["sci.magx"] = parseFloat(data[2])
+        spacecraft["sci.magy"] = parseFloat(data[3])
+        spacecraft["sci.magz"] = parseFloat(data[4])
+    }
 
-        // Listen for requests
-        ws.on('message', function (message) {
-            var parts = message.split(' '),
-                handler = handlers[parts[0]];
-            if (handler) {
-                handler.apply(handlers, parts.slice(1));
+    if (data[0] == 'GYRO') {
+        // timeStamp = parseInt(data[1])
+        spacecraft["sci.gyroX"] = parseFloat(data[2])
+        spacecraft["sci.gyroY"] = parseFloat(data[3])
+        spacecraft["sci.gyroZ"] = parseFloat(data[4])
+    }
+
+    if (data[0] == 'GPS') {
+        // timeStamp = parseInt(data[1])
+        console.log(data)
+        spacecraft["sci.gpsHour"] = parseFloat(data[2])
+        spacecraft["sci.gpsMin"] = parseFloat(data[3])
+        spacecraft["sci.gpsSec"] = parseFloat(data[4])
+        spacecraft["sci.gpsDay"] = parseFloat(data[5])
+        spacecraft["sci.gpsMonth"] = parseFloat(data[6])
+        spacecraft["sci.gpsYear"] = parseFloat(data[7])
+        spacecraft["sci.gpsFix"] = parseFloat(data[8])
+        spacecraft["sci.gpsFixQuality"] = parseFloat(data[9])
+        spacecraft["sci.gpsLatitude"] = parseFloat(data[10])
+        spacecraft["sci.gpsLongitude"] = parseFloat(data[11])
+        spacecraft["sci.gpsSpeed"] = parseFloat(data[12])
+        spacecraft["sci.gpsAngle"] = parseFloat(data[13])
+        spacecraft["sci.gpsLe"] = parseFloat(data[14])
+        spacecraft["sci.gpsSatelites"] = parseFloat(data[15])
+    }
+
+    if (data[0] == 'MOTORA') {
+        // timeStamp = parseInt(data[1])
+        spacecraft["motora"] = parseFloat(data[2])
+    }
+
+    if (data[0] == 'MOTORB') {
+        // timeStamp = parseInt(data[1])
+        spacecraft["motorb"] = parseFloat(data[2])
+    }
+
+
+    if (data[0] == 'PHASE') {
+        // timeStamp = parseInt(data[1])
+        spacecraft["debug.phase"] = data[2]
+    }
+
+
+}
+
+function generateTelemetry() {
+
+    Object.keys(spacecraft).forEach(function(id) {
+        var state = {
+            timestamp: timeStamp,
+            value: spacecraft[id]
+        };
+        histories[id] = histories[id] || []; // Initialize
+        histories[id].push(state);
+    });
+    listeners.forEach(function(listener) {
+        listener();
+    });
+}
+
+function handleConnection(ws) {
+    var subscriptions = {}, // Active subscriptions for this connection
+        handlers = { // Handlers for specific requests
+            dictionary: function() {
+                ws.send(JSON.stringify({
+                    type: "dictionary",
+                    value: dictionary
+                }));
+            },
+            subscribe: function(id) {
+                subscriptions[id] = true;
+            },
+            unsubscribe: function(id) {
+                delete subscriptions[id];
+            },
+            history: function(id) {
+                ws.send(JSON.stringify({
+                    type: "history",
+                    id: id,
+                    value: histories[id]
+                }));
+            }
+        };
+
+    function notifySubscribers() {
+        Object.keys(subscriptions).forEach(function(id) {
+            var history = histories[id];
+            if (history) {
+                ws.send(JSON.stringify({
+                    type: "data",
+                    id: id,
+                    value: history[history.length - 1]
+                }));
             }
         });
-
-        // Stop sending telemetry updates for this connection when closed
-        ws.on('close', function () {
-            listeners = listeners.filter(function (listener) {
-                return listener !== notifySubscribers;
-            });
-        });
-
-        // Notify subscribers when telemetry is updated
-        listeners.push(notifySubscribers);
     }
 
-    update();
-    setInterval(update, CONFIG.interval);
-
-    wss.on('connection', handleConnection);
-
-    console.log("Example spacecraft running on port ");
-    console.log("Press Enter to toggle thruster state.");
-    process.stdin.on('data', function (data) {
-        spacecraft['prop.thrusters'] =
-            (spacecraft['prop.thrusters'] === "OFF") ? "ON" : "OFF";
-        console.log("Thrusters " + spacecraft["prop.thrusters"]);
+    // Listen for requests
+    ws.on('message', function(message) {
+        var parts = message.split(' '),
+            handler = handlers[parts[0]];
+        if (handler) {
+            handler.apply(handlers, parts.slice(1));
+        }
     });
-}());
+
+    // Stop sending telemetry updates for this connection when closed
+    ws.on('close', function() {
+        listeners = listeners.filter(function(listener) {
+            return listener !== notifySubscribers;
+        });
+    });
+
+    // Notify subscribers when telemetry is updated
+    listeners.push(notifySubscribers);
+}
+
+wss.on('connection', handleConnection);
