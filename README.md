@@ -13,6 +13,6 @@
 7. Run `node andromeda.js` in the andromeda-telemetry directory in a seperate terminal instance
 8. Navigate to `localhost:8081` in your browser
 
-#Note
+# Note
 On line 18 of `andromeda.js`, you need to change where the serial port is. You can probably find out the name for this by using the Arduino tools.
 
