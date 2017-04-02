@@ -1,19 +1,26 @@
 /*global require,process,console*/
-var csv = require("fast-csv");
+var SerialPort = require('serialport');
+
+
 var CONFIG = {
     port: 8081,
     dictionary: "dictionary.json",
-    interval: 1000
 };
-var SerialPort = require('serialport');
+
+var timeStamp = 0;
+var startTime = 0;
+
+
+////////////////////////////////////////////////////////
+//// YOU WILL NEED TO CHANCE WHERE THE SERIAL PORT IS
+//// USE SOMETHING LIKE THE ARDUINO TOOLS TO FIND IT
+////////////////////////////////////////////////////////
 var port = new SerialPort('/dev/cu.usbserial-DA00SS8O', {
     parser: SerialPort.parsers.readline('\n')
-
 });
-var timeStamp = 0;
 
 port.on('data', function(data) {
-    console.log("dadas")
+
     updateSpacecraft(data);
     generateTelemetry();
 });
@@ -63,20 +70,23 @@ function updateSpacecraft(data) {
 
     data = data.split(',')
 
-    timeStamp = parseInt(data[1])
-    if (data[0] == 'MESSAGE') {
+    if (startTime == 0) {
+        startTime = parseInt(data[1])
+    } else {
+        timeStamp = parseInt(data[1]) - startTime
+    }
 
+    console.log(timeStamp)
+    if (data[0] == 'MESSAGE') {
         spacecraft["debug.message"] = data[2]
-            // value = data[3]
     }
 
     if (data[0] == 'ERROR') {
-        // timeStamp = parseInt(data[1])
         spacecraft["debug.error"] = data[2]
     }
 
     if (data[0] == 'ALT') {
-        // timeStamp = parseInt(data[1])
+
         spacecraft["sci.atg"] = parseInt(data[2])
     }
 
@@ -103,7 +113,7 @@ function updateSpacecraft(data) {
 
     if (data[0] == 'GPS') {
         // timeStamp = parseInt(data[1])
-        console.log(data)
+
         spacecraft["sci.gpsHour"] = parseFloat(data[2])
         spacecraft["sci.gpsMin"] = parseFloat(data[3])
         spacecraft["sci.gpsSec"] = parseFloat(data[4])
@@ -119,29 +129,24 @@ function updateSpacecraft(data) {
         spacecraft["sci.gpsLe"] = parseFloat(data[14])
         spacecraft["sci.gpsSatelites"] = parseFloat(data[15])
     }
-
     if (data[0] == 'MOTORA') {
-        // timeStamp = parseInt(data[1])
         spacecraft["motora"] = parseFloat(data[2])
     }
-
     if (data[0] == 'MOTORB') {
-        // timeStamp = parseInt(data[1])
         spacecraft["motorb"] = parseFloat(data[2])
     }
-
-
     if (data[0] == 'PHASE') {
-        // timeStamp = parseInt(data[1])
         spacecraft["debug.phase"] = data[2]
     }
-
-
 }
 
+/////////////////////////////////////////////////////////
+//// YOU PROBABLY DON'T NEED TO TOUCH ANYTHING DOWN HERE
+////////////////////////////////////////////////////////
 function generateTelemetry() {
 
     Object.keys(spacecraft).forEach(function(id) {
+        if (true) {}
         var state = {
             timestamp: timeStamp,
             value: spacecraft[id]

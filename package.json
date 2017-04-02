@@ -1,0 +1,22 @@
+{
+  "name": "andromeda-telemetry",
+  "version": "1.0.0",
+  "description": "Parser for incoming data for the M31 Rocket",
+  "main": "andromeda.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JohnBehnke/andromeda-telemetry.git"
+  },
+  "author": "John Behnke",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JohnBehnke/andromeda-telemetry/issues"
+  },
+  "homepage": "https://github.com/JohnBehnke/andromeda-telemetry#readme",
+  "dependencies": {
+    "serialport": "^4.0.7"
+  }
+}
