@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/JohnBehnke/andromeda-telemetry#readme",
   "dependencies": {
-    "serialport": "^4.0.7"
+    "serialport": "^4.0.7",
+    "ws": "^2.2.3"
   }
 }
